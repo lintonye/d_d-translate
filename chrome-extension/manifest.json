@@ -1,0 +1,11 @@
+{
+  "name": "D_D Translate",
+  "action": {},
+  "manifest_version": 3,
+  "version": "0.1",
+  "description": "Translate the current page",
+  "permissions": ["activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
