@@ -12,7 +12,7 @@ function translatePage() {
 
   async function translate(id, lang, text) {
     const response = await fetch(
-      "https://d_d-tranlate.vercel.com/api/translate",
+      "https://d_d-tranlate.vercel.app/api/translate",
       {
         method: "POST",
         headers: {
