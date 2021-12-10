@@ -3,10 +3,10 @@ function translatePage() {
   // menubar.appendChild(document.createTextNode("Menu"));
   // document.body.insertAdjacentElement("afterbegin", menubar);
 
-  function walkDOM(node, callback) {
+  function walkDOM(node, parent, callback) {
+    callback(node, parent);
     for (let c of node.childNodes) {
-      callback(c, node);
-      walkDOM(c, callback);
+      walkDOM(c, node, callback);
     }
   }
 
@@ -25,11 +25,12 @@ function translatePage() {
     return data.translatedText;
   }
 
-  let url = chrome.runtime.getURL("/");
+  let url = window.location.toString();
 
   let translated = 0;
 
-  walkDOM(document.body, async (node, parent) => {
+  walkDOM(document.body, null, async (node, parent) => {
+    // console.log({ translated });
     if (node.nodeType === Node.TEXT_NODE && translated < 10) {
       let text = node.textContent;
       if (text.trim().length > 2) {
@@ -40,11 +41,12 @@ function translatePage() {
         let id = Array.from(new Uint8Array(hashBuffer))
           .map((b) => b.toString(16))
           .join("");
-        node.textContent = await translate(url, id, "ZH", text);
+        // node.textContent = await translate(url, id, "ZH", text);
         if (!parent.id) parent.id = id;
         translated++;
       }
     }
+    console.log({ translated });
   });
 }
 
