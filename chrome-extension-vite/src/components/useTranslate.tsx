@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -18,7 +19,7 @@ function walkDOM(
   parent: Element | null,
   callback: (node: Element, parent: Element | null) => void
 ) {
-  if (!node.classList || !node.classList.contains(".translate-overlay")) {
+  if (!node.classList || !node.classList.contains("translate-overlay")) {
     callback(node, parent);
     for (let c of node.childNodes) {
       walkDOM(c as Element, node, callback); //TODO this casting is wrong
@@ -172,5 +173,37 @@ export function useTranslate() {
         translatedText,
       });
     },
+  };
+}
+
+export function useLockedElements() {
+  let [lockedElementIds, setLockedElementIds] = useState(new Set<string>());
+  let url = useUrl();
+  useEffect(() => {
+    let q = query(collection(db, "lockedElements"), where("url", "==", url));
+    let unsub = onSnapshot(q, (snapshot) => {
+      let ids = new Set<string>();
+      snapshot.docs.forEach((d) => {
+        let data = d.data();
+        ids.add(data.elementId);
+      });
+      setLockedElementIds(ids);
+    });
+    return unsub;
+  }, [url]);
+  return {
+    lock: async (url: string, elementId: string) => {
+      let d = doc(db, "lockedElements", docId(url, elementId));
+      await setDoc(d, {
+        url,
+        elementId,
+        locked: true,
+      });
+    },
+    unlock: async (url: string, elementId: string) => {
+      let d = doc(db, "lockedElements", docId(url, elementId));
+      await deleteDoc(d);
+    },
+    lockedElementIds,
   };
 }

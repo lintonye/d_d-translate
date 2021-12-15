@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useTranslate } from "./useTranslate";
+import { useLockedElements, useTranslate } from "./useTranslate";
 import { useUrl } from "./useUrl";
 
 function useViewportBoundingBox(id: string): [DOMRect | undefined, number] {
@@ -108,7 +108,7 @@ function EditableElement({ id, locked, onSave, onEdit }: EditableElementProps) {
         left: boundingBox?.x,
         pointerEvents: "auto",
         position: "absolute",
-        border: locked ? "2px solid red" : "0px",
+        border: locked && !inEditMode ? "2px solid red" : "0px",
         // background: "rgba(255, 255, 255, 0.5)",
       }}
       onMouseEnter={() => setEditButtonVisible(true)}
@@ -138,15 +138,6 @@ function EditableElement({ id, locked, onSave, onEdit }: EditableElementProps) {
   ) : null;
 }
 
-function useLockedElements() {
-  let lockedElementIds = new Set<string>();
-  return {
-    lock: (url: string, elementId: string) => {},
-    unlock: (url: string, elementId: string) => {},
-    lockedElementIds,
-  };
-}
-
 export default function TranslateOverlay() {
   let { elementIds, saveTranslation } = useTranslate();
   let { lockedElementIds, lock, unlock } = useLockedElements();
@@ -168,9 +159,9 @@ export default function TranslateOverlay() {
           id={id}
           key={id}
           locked={lockedElementIds.has(id)}
-          onSave={(newText) => {
-            saveTranslation(url, id, newText);
-            unlock(url, id);
+          onSave={async (newText) => {
+            await saveTranslation(url, id, newText);
+            await unlock(url, id);
           }}
           onEdit={() => {
             lock(url, id);
