@@ -86,9 +86,16 @@ type EditableElementProps = {
   locked: boolean;
   onSave: (newText: string) => void;
   onEdit: () => void;
+  onClose: () => void;
 };
 
-function EditableElement({ id, locked, onSave, onEdit }: EditableElementProps) {
+function EditableElement({
+  id,
+  locked,
+  onSave,
+  onEdit,
+  onClose,
+}: EditableElementProps) {
   let [editButtonVisible, setEditButtonVisible] = useState(false);
   let [boundingBox] = useViewportBoundingBox(id);
   let [inEditMode, setInEditMode] = useState(false);
@@ -125,14 +132,25 @@ function EditableElement({ id, locked, onSave, onEdit }: EditableElementProps) {
         </button>
       )}
       {inEditMode && (
-        <Editor
-          elementId={id}
-          onSave={(newText) => {
-            setInEditMode(false);
-            setEditButtonVisible(false);
-            typeof onSave === "function" && onSave(newText);
-          }}
-        />
+        <>
+          <Editor
+            elementId={id}
+            onSave={(newText) => {
+              setInEditMode(false);
+              setEditButtonVisible(false);
+              typeof onSave === "function" && onSave(newText);
+              typeof onClose === "function" && onClose();
+            }}
+          />
+          <button
+            onClick={() => {
+              setInEditMode(false);
+              typeof onClose === "function" && onClose();
+            }}
+          >
+            Cancel
+          </button>
+        </>
       )}
     </div>
   ) : null;
@@ -161,10 +179,12 @@ export default function TranslateOverlay() {
           locked={lockedElementIds.has(id)}
           onSave={async (newText) => {
             await saveTranslation(url, id, newText);
-            await unlock(url, id);
           }}
           onEdit={() => {
             lock(url, id);
+          }}
+          onClose={() => {
+            unlock(url, id);
           }}
         />
       ))}

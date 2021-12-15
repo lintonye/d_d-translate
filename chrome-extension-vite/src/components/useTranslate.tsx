@@ -20,6 +20,7 @@ function walkDOM(
   callback: (node: Element, parent: Element | null) => void
 ) {
   if (!node.classList || !node.classList.contains("translate-overlay")) {
+    // console.warn("d_d, walkDOM", { node, parent });
     callback(node, parent);
     for (let c of node.childNodes) {
       walkDOM(c as Element, node, callback); //TODO this casting is wrong
@@ -64,10 +65,15 @@ function updateElement(element: Element, translatedText: string) {
 
 function collectTranslatableElements() {
   let translatableElements: Element[] = [];
+  let validTags = ["P", "SPAN", "H1", "H2", "H3", "H4", "H5", "H6", "DIV", "A"];
   walkDOM(document.body, null, async (node, parent) => {
     // console.log({ translated });
-    if (node.nodeType === Node.TEXT_NODE) {
+    if (
+      node.nodeType === Node.TEXT_NODE &&
+      validTags.includes(parent?.nodeName!)
+    ) {
       let text = node.textContent;
+      console.warn("d_d, text", { node, parent, text });
       if (
         !!!parent?.getAttribute("data-original-text") &&
         parent &&
@@ -111,6 +117,11 @@ async function translateAll(url: string, translatableElements: Element[]) {
   let elementToTranslate = translatableElements.filter(
     (e) => !e.getAttribute("data-original-text")
   );
+  // console.warn("d_d, elementToTranslate", {
+  //   elementToTranslate,
+  //   translatableElements,
+  //   document,
+  // });
   await Promise.all(
     elementToTranslate.map(async (element) => {
       let text = element.textContent!;
@@ -118,7 +129,7 @@ async function translateAll(url: string, translatableElements: Element[]) {
       updateElement(element, translatedText);
       // save to firestore
       let d = doc(db, "translations", docId(url, element.id));
-      console.log({ d });
+      // console.log({ d });
       await setDoc(d, {
         elementId: element.id,
         url,
