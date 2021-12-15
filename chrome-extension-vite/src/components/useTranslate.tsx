@@ -59,7 +59,8 @@ function docId(url: string, elementId: string) {
 }
 
 function updateElement(element: Element, translatedText: string) {
-  element.setAttribute("data-original-text", element.textContent ?? "");
+  if (!element.getAttribute("data-original-text"))
+    element.setAttribute("data-original-text", element.textContent ?? "");
   element.textContent = translatedText;
 }
 
@@ -145,9 +146,10 @@ function useTranslatedElementIds() {
   let [translatableElements, setTranslatableElements] = useState<string[]>([]);
   let url = useUrl();
   useEffect(() => {
-    let translatableElements = collectTranslatableElements();
     let unsub: null | (() => void) = null;
-    translateAll(url, translatableElements).then(() => {
+    async function collectAndTranslate() {
+      let translatableElements = collectTranslatableElements();
+      await translateAll(url, translatableElements);
       setTranslatableElements(translatableElements.map((e) => e.id));
       // Update DOM when db changes
       unsub = onSnapshot(
@@ -162,7 +164,8 @@ function useTranslatedElementIds() {
           });
         }
       );
-    });
+    }
+    setTimeout(collectAndTranslate, 2000);
     return () => {
       typeof unsub === "function" && unsub();
     };

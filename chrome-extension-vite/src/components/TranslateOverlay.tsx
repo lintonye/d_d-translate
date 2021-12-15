@@ -156,22 +156,14 @@ function EditableElement({
   ) : null;
 }
 
-export default function TranslateOverlay() {
+function TranslationUI() {
   let { elementIds, saveTranslation } = useTranslate();
   let { lockedElementIds, lock, unlock } = useLockedElements();
   let url = useUrl();
+
   return (
-    <div style={{ height: "100%" }}>
-      <div
-        style={{
-          background: "#000",
-          color: "#fff",
-          padding: 5,
-          fontSize: 10,
-        }}
-      >
-        D_D Translate
-      </div>
+    <div>
+      {" "}
       {elementIds.map((id) => (
         <EditableElement
           id={id}
@@ -188,6 +180,40 @@ export default function TranslateOverlay() {
           }}
         />
       ))}
+    </div>
+  );
+}
+
+export default function TranslateOverlay() {
+  let [translationOn, setTranslationOn] = useState(false);
+  return (
+    <div
+      style={{
+        height: "100%",
+        background: translationOn ? "rgba(100, 200, 100, 0.1)" : "transparent",
+      }}
+    >
+      <div
+        style={{
+          background: "#000",
+          color: "#fff",
+          padding: 5,
+          fontSize: 14,
+          display: "flex",
+          pointerEvents: "auto",
+        }}
+      >
+        <div>D_D Translate</div>
+        <label style={{}}>
+          <input
+            type="checkbox"
+            checked={translationOn}
+            onChange={(e) => setTranslationOn(e.target.checked)}
+          />
+          Translate
+        </label>
+      </div>
+      {translationOn && <TranslationUI />}
     </div>
   );
 }
