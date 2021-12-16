@@ -108,11 +108,11 @@ async function translateAndStoreText(
 
 async function handler(req: NextApiRequest, res: NextApiResponse<Output>) {
   let { id, lang, text, url } = req.body;
-  // let translatedText = await getStoredTranslation({ url, id, lang });
-  // if (!translatedText) {
-  //   translatedText = await translateAndStoreText({ url, id, lang }, text);
-  // }
-  let translatedText = "翻译成功！" + text;
+  let translatedText = await getStoredTranslation({ url, id, lang });
+  if (!translatedText) {
+    translatedText = await translateAndStoreText({ url, id, lang }, text);
+  }
+  // let translatedText = "翻译成功！" + text;
   res.status(200).json({ id, text, lang, url, translatedText });
 }
 

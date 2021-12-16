@@ -60,7 +60,6 @@ function Editor({
       style={{
         background: "#fff",
         padding: 5,
-        boxShadow: "0 0 0 1px rgba(0,0,0,.1), 0 2px 3px rgba(0,0,0,.2)",
         minHeight: 100,
         pointerEvents: "all",
       }}
@@ -132,7 +131,14 @@ function EditableElement({
         </button>
       )}
       {inEditMode && (
-        <>
+        <div
+          style={{
+            position: "relative",
+            zIndex: 100,
+            background: "#fff",
+            boxShadow: "0 0 0 1px rgba(0,0,0,.1), 0 2px 3px rgba(0,0,0,.2)",
+          }}
+        >
           <Editor
             elementId={id}
             onSave={(newText) => {
@@ -150,7 +156,7 @@ function EditableElement({
           >
             Cancel
           </button>
-        </>
+        </div>
       )}
     </div>
   ) : null;
