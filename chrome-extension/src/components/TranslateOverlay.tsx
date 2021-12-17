@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ButtonHTMLAttributes, useEffect, useState } from "react";
 import { useLockedElements, useTranslate } from "./useTranslate";
 import { useUrl } from "./useUrl";
 
@@ -75,7 +75,7 @@ function Editor({
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
       />
-      <button>Save</button>
+      <Button>Save</Button>
     </form>
   );
 }
@@ -87,6 +87,15 @@ type EditableElementProps = {
   onEdit: () => void;
   onClose: () => void;
 };
+
+function Button(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      {...props}
+      style={{ background: "#fff", color: "#000", padding: 5 }}
+    />
+  );
+}
 
 function EditableElement({
   id,
@@ -121,14 +130,14 @@ function EditableElement({
       onMouseLeave={() => setEditButtonVisible(false)}
     >
       {editButtonVisible && !inEditMode && !locked && (
-        <button
+        <Button
           onClick={() => {
             setInEditMode(true);
             typeof onEdit === "function" && onEdit();
           }}
         >
           Edit
-        </button>
+        </Button>
       )}
       {inEditMode && (
         <div
@@ -148,14 +157,14 @@ function EditableElement({
               typeof onClose === "function" && onClose();
             }}
           />
-          <button
+          <Button
             onClick={() => {
               setInEditMode(false);
               typeof onClose === "function" && onClose();
             }}
           >
             Cancel
-          </button>
+          </Button>
         </div>
       )}
     </div>
