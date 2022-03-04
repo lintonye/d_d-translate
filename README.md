@@ -1,6 +1,27 @@
 # Getting started
 
+## Gallery
+
+The website that lists translated articles, view count etc.
+
+0. Directory: `cd gallery`
+1. Install dependencies
+
+```
+yarn
+```
+
+2. Start the dev server:
+
+```
+yarn dev
+```
+
+3. Visit `http://localhost:3001`
+
 ## Backend
+
+This is the backend that invokes deepL.
 
 0. Directory: `cd backend`
 1. Install dependencies for backend
@@ -34,7 +55,7 @@ yarn
 yarn dev
 ```
 
-Visiting `http://localhost:3000`, you should see the main UI along with some sample text.
+Visiting `http://localhost:3002`, you should see the main UI along with some sample text.
 
 3. Build the extension
 
