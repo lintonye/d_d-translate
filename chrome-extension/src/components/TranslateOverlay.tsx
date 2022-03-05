@@ -1,6 +1,7 @@
 import { ButtonHTMLAttributes, useEffect, useState } from "react";
 import { useLockedElements, useTranslate } from "./useTranslate";
 import { useUrl } from "./useUrl";
+import { getPageData } from "../single-file";
 
 function useViewportBoundingBox(id: string): [DOMRect | undefined, number] {
   const [boundingBox, setBoundingBox] = useState<DOMRect>();
@@ -207,6 +208,10 @@ export default function TranslateOverlay() {
     ["Spanish", "ES"],
     ["Korean", "KO"],
   ];
+  const onPublish = async () => {
+    const pageData = await getPageData({}, null, document, window);
+    console.log("!!!!!!!publish!", { pageData });
+  };
   return (
     <div
       style={{
@@ -217,7 +222,6 @@ export default function TranslateOverlay() {
       <div
         style={{
           background: "#000",
-          color: "#fff",
           padding: 5,
           fontSize: 14,
           display: "flex",
@@ -225,15 +229,15 @@ export default function TranslateOverlay() {
           gap: 16,
         }}
       >
-        <div>D_D Translate</div>
+        <div style={{ color: "#fff" }}>D_D Translate</div>
         <select>
           {langs.map((lang) => (
-            <option label={lang[0]} key={lang[1]}>
-              {lang[1]}
+            <option key={lang[1]} value={lang[1]}>
+              {lang[0]}
             </option>
           ))}
         </select>
-        <label style={{}}>
+        <label style={{ color: "#fff" }}>
           <input
             type="checkbox"
             checked={translationOn}
@@ -242,7 +246,7 @@ export default function TranslateOverlay() {
           Show translations
         </label>
         <div style={{ flex: 1 }} />
-        <button>Publish</button>
+        <button onClick={onPublish}>Publish</button>
       </div>
       {translationOn && <TranslationUI />}
     </div>
