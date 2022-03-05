@@ -201,6 +201,12 @@ function TranslationUI() {
 
 export default function TranslateOverlay() {
   let [translationOn, setTranslationOn] = useState(false);
+  const langs = [
+    ["Simplified Chinese", "ZH"],
+    ["German", "GE"],
+    ["Spanish", "ES"],
+    ["Korean", "KO"],
+  ];
   return (
     <div
       style={{
@@ -216,17 +222,27 @@ export default function TranslateOverlay() {
           fontSize: 14,
           display: "flex",
           pointerEvents: "auto",
+          gap: 16,
         }}
       >
         <div>D_D Translate</div>
+        <select>
+          {langs.map((lang) => (
+            <option label={lang[0]} key={lang[1]}>
+              {lang[1]}
+            </option>
+          ))}
+        </select>
         <label style={{}}>
           <input
             type="checkbox"
             checked={translationOn}
             onChange={(e) => setTranslationOn(e.target.checked)}
           />
-          Translate
+          Show translations
         </label>
+        <div style={{ flex: 1 }} />
+        <button>Publish</button>
       </div>
       {translationOn && <TranslationUI />}
     </div>
