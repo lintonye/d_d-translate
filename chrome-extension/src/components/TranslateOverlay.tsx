@@ -208,9 +208,28 @@ export default function TranslateOverlay() {
     ["Spanish", "ES"],
     ["Korean", "KO"],
   ];
+  // function download(filename: string, text: string) {
+  //   var element = document.createElement("a");
+  //   element.setAttribute(
+  //     "href",
+  //     "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+  //   );
+  //   element.setAttribute("download", filename);
+
+  //   element.style.display = "none";
+  //   document.body.appendChild(element);
+
+  //   element.click();
+
+  //   document.body.removeChild(element);
+  // }
   const onPublish = async () => {
     const pageData = await getPageData({}, null, document, window);
-    console.log("!!!!!!!publish!", { pageData });
+    // console.log("!!!!!!!publish!", { pageData });
+    const blob = new Blob(pageData.content, { type: "text/html" });
+    const dataBuff = blob.arrayBuffer;
+    // TODO call some function in upload to upload it to AR
+    // download("export.html", pageData.content);
   };
   return (
     <div
