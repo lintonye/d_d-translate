@@ -1,4 +1,5 @@
 import Arweave from "arweave";
+import axios from "axios";
 
 export async function uploadToKoii(
   walletAddress: string,
@@ -100,7 +101,7 @@ const initializeArTx = async ({ walletAddress, data }: InitializeArTxProps) => {
     description: data?.description,
     ticker: "KOINFT",
     balances,
-    contentType: data?.file?.type,
+    contentType: "text/html", //data?.file?.type,
     createdAt,
     tags: data?.tags?.split?.(",") || [],
   };
@@ -178,7 +179,8 @@ const signArTx = async (tx: any, initialState: any) => {
   */
   await window.koiiWallet.registerData(tx.id);
 
-  await generateCardWithData(body);
+  // await generateCardWithData(body);
+  console.log(tx.id);
 
   return {
     tx: tx,
@@ -204,16 +206,19 @@ const uploadArTx = async (tx: any) => {
 };
 
 export const generateCardWithData = async (body: any) => {
-  // return await axios.post(`https://api.koii.live/generateCardWithData`, body, {
-  //   transformRequest: (data: any, headers: any) => {
-  //     headers.common["Access-Control-Allow-Origin"] = "*";
-  //     return data;
-  //   },
-  //   baseURL: undefined,
-  // });
-  const response = await fetch(`https://api.koii.live/generateCardWithData`, {
-    method: "POST",
-    body,
+  return await axios.post(`https://api.koii.live/generateCardWithData`, body, {
+    transformRequest: (data: any, headers: any) => {
+      headers.common["Access-Control-Allow-Origin"] = "*";
+      return data;
+    },
+    baseURL: undefined,
   });
-  return response;
+  // const response = await fetch(`https://api.koii.live/generateCardWithData`, {
+  //   method: "POST",
+  //   headers: {
+  //     "Access-Control-Allow-Origin": "*",
+  //   },
+  //   body,
+  // });
+  // return response;
 };
