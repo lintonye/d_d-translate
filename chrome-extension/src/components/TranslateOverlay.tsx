@@ -2,6 +2,7 @@ import { ButtonHTMLAttributes, useEffect, useState } from "react";
 import { useLockedElements, useTranslate } from "./useTranslate";
 import { useUrl } from "./useUrl";
 import { getPageData } from "../single-file";
+import { uploadToKoii } from "./upload";
 
 function useViewportBoundingBox(id: string): [DOMRect | undefined, number] {
   const [boundingBox, setBoundingBox] = useState<DOMRect>();
@@ -226,10 +227,34 @@ export default function TranslateOverlay() {
   const onPublish = async () => {
     const pageData = await getPageData({}, null, document, window);
     // console.log("!!!!!!!publish!", { pageData });
-    const blob = new Blob(pageData.content, { type: "text/html" });
-    const dataBuff = blob.arrayBuffer;
-    // TODO call some function in upload to upload it to AR
+    const encoder = new TextEncoder();
+    const dataBuff = encoder.encode(pageData.content);
     // download("export.html", pageData.content);
+    const extension = window.koiiWallet;
+    // console.log(extension);
+    if (extension) {
+      const addressResult = await extension.getAddress();
+      let walletAddress;
+      if (addressResult.status === 200) {
+        walletAddress = addressResult.data;
+      } else {
+        const result = await extension.connect();
+        if (result.status === 200) {
+          walletAddress = (await extension.getAddress()).data;
+        }
+      }
+      if (walletAddress) {
+        console.log("!!! address", addressResult.data);
+        try {
+          await uploadToKoii(walletAddress, dataBuff);
+        } catch (error) {
+          console.error("Upload failed!", error);
+          alert("Upload failed");
+        }
+      }
+    } else {
+      alert("Please install Finnie wallet!");
+    }
   };
   return (
     <div

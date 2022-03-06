@@ -1,5 +1,21 @@
 import Arweave from "arweave";
 
+export async function uploadToKoii(
+  walletAddress: string,
+  dataBuffer: ArrayBuffer
+) {
+  const data = {
+    name: "test",
+    username: "testusername",
+    dataBuffer,
+  };
+  const { txFee, tx, initialState } = await initializeArTx({
+    walletAddress,
+    data,
+  });
+  return await signArTx(tx, initialState);
+}
+
 /**
  *
  * @param {Function} fn Function to poll for result
@@ -64,10 +80,8 @@ interface InitializeArTxProps {
   walletAddress: string;
   data: Record<string, any>;
 }
-export const initializeArTx = async ({
-  walletAddress,
-  data,
-}: InitializeArTxProps) => {
+
+const initializeArTx = async ({ walletAddress, data }: InitializeArTxProps) => {
   // init arweave
   let arweave = await initArweave();
 
@@ -77,7 +91,7 @@ export const initializeArTx = async ({
   // Today's date
   const createdAt = Math.floor(new Date().getTime() / 1000).toString();
   // get data buffer from the uploaded file.
-  const [dataBuffer] = await getFileData(data?.fileThumbnail);
+  const dataBuffer = data.dataBuffer;
 
   const initialState = {
     owner: walletAddress,
@@ -140,7 +154,7 @@ export const createArTx = async (dataBuffer: any, initialState: any) => {
  *
  * @returns transaction with tags added
  */
-export const signArTx = async (tx: any, initialState: any, media: any) => {
+const signArTx = async (tx: any, initialState: any) => {
   /* 
     First, we sign the transaction using Finnie.
   */
@@ -156,7 +170,7 @@ export const signArTx = async (tx: any, initialState: any, media: any) => {
       ...initialState,
       id: tx.id,
     },
-    media,
+    // media,
   };
 
   /* 
@@ -164,7 +178,7 @@ export const signArTx = async (tx: any, initialState: any, media: any) => {
   */
   await window.koiiWallet.registerData(tx.id);
 
-  await generateCardWithData(body).catch(() => {});
+  await generateCardWithData(body);
 
   return {
     tx: tx,
@@ -178,7 +192,7 @@ export const signArTx = async (tx: any, initialState: any, media: any) => {
  *
  * @returns transaction with tags added
  */
-export const uploadArTx = async (tx: any) => {
+const uploadArTx = async (tx: any) => {
   // init arweave
   let arweave = await initArweave();
   let uploader;
@@ -190,11 +204,16 @@ export const uploadArTx = async (tx: any) => {
 };
 
 export const generateCardWithData = async (body: any) => {
-  return await axios.post(`https://api.koii.live/generateCardWithData`, body, {
-    transformRequest: (data, headers: any) => {
-      headers.common["Access-Control-Allow-Origin"] = "*";
-      return data;
-    },
-    baseURL: undefined,
+  // return await axios.post(`https://api.koii.live/generateCardWithData`, body, {
+  //   transformRequest: (data: any, headers: any) => {
+  //     headers.common["Access-Control-Allow-Origin"] = "*";
+  //     return data;
+  //   },
+  //   baseURL: undefined,
+  // });
+  const response = await fetch(`https://api.koii.live/generateCardWithData`, {
+    method: "POST",
+    body,
   });
+  return response;
 };
