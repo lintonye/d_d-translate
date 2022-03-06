@@ -203,6 +203,7 @@ function TranslationUI() {
 
 export default function TranslateOverlay() {
   let [translationOn, setTranslationOn] = useState(false);
+  const [loading, setLoading] = useState(false);
   const langs = [
     ["Simplified Chinese", "ZH"],
     ["German", "GE"],
@@ -231,7 +232,6 @@ export default function TranslateOverlay() {
     const dataBuff = encoder.encode(pageData.content);
     // download("export.html", pageData.content);
     const extension = window.koiiWallet;
-    // console.log(extension);
     if (extension) {
       const addressResult = await extension.getAddress();
       let walletAddress;
@@ -244,15 +244,24 @@ export default function TranslateOverlay() {
         }
       }
       if (walletAddress) {
-        console.log("!!! address", addressResult.data);
+        // console.log("!!! address", addressResult.data);
         try {
-          await uploadToKoii(walletAddress, dataBuff);
+          setLoading(true);
+          const { arTxId, koiiTxId } = await uploadToKoii(
+            walletAddress,
+            dataBuff
+          );
+          console.log({ arTxId, koiiTxId });
+          alert("Upload successful!");
         } catch (error) {
           console.error("Upload failed!", error);
           alert("Upload failed");
+        } finally {
+          setLoading(false);
         }
       }
     } else {
+      console.log("window", window);
       alert("Please install Finnie wallet!");
     }
   };
@@ -290,7 +299,9 @@ export default function TranslateOverlay() {
           Show translations
         </label>
         <div style={{ flex: 1 }} />
-        <button onClick={onPublish}>Publish</button>
+        <Button onClick={onPublish} disabled={loading}>
+          {loading ? "Publishing..." : "Publish"}
+        </Button>
       </div>
       {translationOn && <TranslationUI />}
     </div>

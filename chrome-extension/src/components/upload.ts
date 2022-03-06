@@ -7,14 +7,39 @@ export async function uploadToKoii(
 ) {
   const data = {
     name: "test",
-    username: "testusername",
+    username: "NAT",
     dataBuffer,
   };
-  const { txFee, tx, initialState } = await initializeArTx({
+  const { tx, initialState } = await initializeArTx({
     walletAddress,
     data,
   });
-  return await signArTx(tx, initialState);
+  await signArTx(tx, initialState);
+  const koiiTxId = await registerOnKoii(walletAddress, tx.id);
+  return { arTxId: tx.id, koiiTxId };
+}
+
+async function registerOnKoii(walletAddress: string, txId: string) {
+  // const ktools = new Web();
+  // console.log("ktools loading wallet...");
+  // await ktools.loadWallet(walletAddress);
+  // console.log("ktools burning koii attention...");
+  // const koiiTxId = await ktools.burnKoiAttention(txId);
+  // return koiiTxId;
+  const response = await fetch(
+    `http://localhost:3000/api/register-koii?walletAddress=${encodeURIComponent(
+      walletAddress
+    )}&arTxId=${txId}`,
+    { method: "GET" }
+  );
+  if (response.status === 200) {
+    const result = await response.json();
+    return result.koiiTxId;
+  } else {
+    throw new Error(
+      `Failed to register on Koii ${response.status}, ${response.body}`
+    );
+  }
 }
 
 /**
@@ -180,11 +205,9 @@ const signArTx = async (tx: any, initialState: any) => {
   await window.koiiWallet.registerData(tx.id);
 
   // await generateCardWithData(body);
-  console.log(tx.id);
+  // console.log(tx.id);
 
-  return {
-    tx: tx,
-  };
+  return tx;
 };
 
 /**
