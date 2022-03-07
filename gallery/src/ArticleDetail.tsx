@@ -22,9 +22,16 @@ function useArticleStats(id) {
 
 function Stats(props: StatsProps) {
   return (
-    <div className="absolute bottom-6 right-6 bg-purple-700 p-4 text-white rounded-full shadow-xl">
-      <div>
-        {props.viewCount} views, {props.koiis} Koii earned
+    <div className="text-sm absolute bottom-6 right-6 bg-purple-700 p-4 text-white rounded-full shadow-xl space-y-2">
+      <div className="flex justify-between w-full">
+        <div>{props.viewCount} views</div>
+        <div>{props.koiis} Koii earned</div>
+      </div>
+      <div className="text-xs">
+        Alex1237, Tao
+        <a className="underline border-l border-white pl-2 ml-2 cursor-pointer">
+          Tip translators
+        </a>
       </div>
     </div>
   );
