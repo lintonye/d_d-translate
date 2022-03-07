@@ -94,7 +94,7 @@ function Button(props: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
-      style={{ background: "#fff", color: "#000", padding: 5 }}
+      style={{ background: "#fff", color: "#000", padding: 5, ...props.style }}
     />
   );
 }
@@ -278,6 +278,7 @@ export default function TranslateOverlay() {
           padding: 5,
           fontSize: 14,
           display: "flex",
+          alignItems: "center",
           pointerEvents: "auto",
           gap: 16,
         }}
@@ -299,7 +300,11 @@ export default function TranslateOverlay() {
           Show translations
         </label>
         <div style={{ flex: 1 }} />
-        <Button onClick={onPublish} disabled={loading}>
+        <Button
+          onClick={onPublish}
+          disabled={loading}
+          style={loading ? { color: "#999" } : {}}
+        >
           {loading ? "Publishing..." : "Publish"}
         </Button>
       </div>
