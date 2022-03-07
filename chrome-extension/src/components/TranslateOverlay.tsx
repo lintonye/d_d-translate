@@ -251,8 +251,8 @@ export default function TranslateOverlay() {
             walletAddress,
             dataBuff
           );
-          console.log({ arTxId, koiiTxId });
-          alert("Upload successful!");
+          console.log("Finnie wallet done", { arTxId, koiiTxId });
+          alert("Upload successfully!");
         } catch (error) {
           console.error("Upload failed!", error);
           alert("Upload failed");
