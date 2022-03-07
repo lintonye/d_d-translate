@@ -1,6 +1,8 @@
-import { ButtonHTMLAttributes, useEffect, useState } from "react";
+import { ButtonHTMLAttributes, useEffect, useRef, useState } from "react";
 import { useLockedElements, useTranslate } from "./useTranslate";
 import { useUrl } from "./useUrl";
+import { getPageData } from "../single-file";
+import { uploadToKoii } from "./upload";
 
 function useViewportBoundingBox(id: string): [DOMRect | undefined, number] {
   const [boundingBox, setBoundingBox] = useState<DOMRect>();
@@ -92,7 +94,7 @@ function Button(props: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
-      style={{ background: "#fff", color: "#000", padding: 5 }}
+      style={{ background: "#fff", color: "#000", padding: 5, ...props.style }}
     />
   );
 }
@@ -201,39 +203,102 @@ function TranslationUI() {
 
 export default function TranslateOverlay() {
   let [translationOn, setTranslationOn] = useState(false);
+  const [loading, setLoading] = useState(false);
   const langs = [
     ["Simplified Chinese", "ZH"],
     ["German", "GE"],
     ["Spanish", "ES"],
     ["Korean", "KO"],
   ];
+  // function download(filename: string, text: string) {
+  //   var element = document.createElement("a");
+  //   element.setAttribute(
+  //     "href",
+  //     "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+  //   );
+  //   element.setAttribute("download", filename);
+
+  //   element.style.display = "none";
+  //   document.body.appendChild(element);
+
+  //   element.click();
+
+  //   document.body.removeChild(element);
+  // }
+
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const onPublish = async () => {
+    // download("export.html", pageData.content);
+    const extension = window.koiiWallet;
+    if (extension) {
+      const addressResult = await extension.getAddress();
+      let walletAddress;
+      if (addressResult.status === 200) {
+        walletAddress = addressResult.data;
+      } else {
+        const result = await extension.connect();
+        if (result.status === 200) {
+          walletAddress = (await extension.getAddress()).data;
+        }
+      }
+      if (walletAddress) {
+        // console.log("!!! address", addressResult.data);
+        try {
+          setLoading(true);
+          if (toolbarRef.current) {
+            toolbarRef.current.style.display = "none";
+          }
+          const pageData = await getPageData({}, null, document, window);
+          // console.log("!!!!!!!publish!", { pageData });
+          const encoder = new TextEncoder();
+          const dataBuff = encoder.encode(pageData.content);
+          const { arTxId, koiiTxId } = await uploadToKoii(
+            walletAddress,
+            dataBuff
+          );
+          console.log("Finnie wallet done", { arTxId, koiiTxId });
+          alert("Upload successfully!");
+        } catch (error) {
+          console.error("Upload failed!", error);
+          alert("Upload failed");
+        } finally {
+          setLoading(false);
+          if (toolbarRef.current) toolbarRef.current.style.display = "block";
+        }
+      }
+    } else {
+      console.log("window", window);
+      alert("Please install Finnie wallet!");
+    }
+  };
   return (
     <div
       style={{
         height: "100%",
         background: translationOn ? "rgba(100, 200, 100, 0.1)" : "transparent",
       }}
+      ref={toolbarRef}
     >
       <div
         style={{
           background: "#000",
-          color: "#fff",
           padding: 5,
           fontSize: 14,
           display: "flex",
+          alignItems: "center",
           pointerEvents: "auto",
           gap: 16,
         }}
       >
-        <div>D_D Translate</div>
+        <div style={{ color: "#fff" }}>D_D Translate</div>
         <select>
           {langs.map((lang) => (
-            <option label={lang[0]} key={lang[1]}>
-              {lang[1]}
+            <option key={lang[1]} value={lang[1]}>
+              {lang[0]}
             </option>
           ))}
         </select>
-        <label style={{}}>
+        <label style={{ color: "#fff" }}>
           <input
             type="checkbox"
             checked={translationOn}
@@ -242,7 +307,13 @@ export default function TranslateOverlay() {
           Show translations
         </label>
         <div style={{ flex: 1 }} />
-        <button>Publish</button>
+        <Button
+          onClick={onPublish}
+          disabled={loading}
+          style={loading ? { color: "#999" } : {}}
+        >
+          {loading ? "Publishing..." : "Publish"}
+        </Button>
       </div>
       {translationOn && <TranslationUI />}
     </div>

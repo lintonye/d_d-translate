@@ -74,7 +74,7 @@ function collectTranslatableElements() {
       validTags.includes(parent?.nodeName!)
     ) {
       let text = node.textContent;
-      console.warn("d_d, text", { node, parent, text });
+      // console.warn("d_d, text", { node, parent, text });
       if (
         !!!parent?.getAttribute("data-original-text") &&
         parent &&
