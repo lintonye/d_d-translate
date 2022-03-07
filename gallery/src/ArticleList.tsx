@@ -27,10 +27,10 @@ function useArticles() {
     return [
       {
         id: "link1",
-        url: "https://xw2n7w5ggqzxyy5c2e6vo6uztrvztuxm6ir4x23bqgtxitgsdebq.arweave.net/vbTf26Y0M3xjotE9V3qZnGuZ0uzyI8vrYYGndEzSGQM",
-        title: "#13 Probably Nothing zh",
+        url: "https://y5stpgibaqkig6g23wsa4g7nhfgj2uwcvwecrfaxxvzl5vocbu.arweave.net/x2U3mQEEFIN42t2kDhvtOUydUsKtiCiUF71-yvtXCDc",
+        title: "可能没有什么 #4",
         excerpt:
-          '在我们接近第一季的时候还有很多事情要做，从发行$CODE，到重新开放会员资格，再到会议的旅行赞助。像往常一样，"可能没有什么 "团队在这里为您提供最新的信息。',
+          "假期来临了！我们的一些公会和项目组正在为新的一年而收尾。我们的一些公会和项目组正在为新的一年收尾（包括我们的通讯组）。我们鼓励大家利用这段时间以自己的方式充电。",
       },
       {
         id: "link2",

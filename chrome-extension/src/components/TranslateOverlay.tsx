@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, useEffect, useState } from "react";
+import { ButtonHTMLAttributes, useEffect, useRef, useState } from "react";
 import { useLockedElements, useTranslate } from "./useTranslate";
 import { useUrl } from "./useUrl";
 import { getPageData } from "../single-file";
@@ -225,11 +225,9 @@ export default function TranslateOverlay() {
 
   //   document.body.removeChild(element);
   // }
+
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const onPublish = async () => {
-    const pageData = await getPageData({}, null, document, window);
-    // console.log("!!!!!!!publish!", { pageData });
-    const encoder = new TextEncoder();
-    const dataBuff = encoder.encode(pageData.content);
     // download("export.html", pageData.content);
     const extension = window.koiiWallet;
     if (extension) {
@@ -247,6 +245,13 @@ export default function TranslateOverlay() {
         // console.log("!!! address", addressResult.data);
         try {
           setLoading(true);
+          if (toolbarRef.current) {
+            toolbarRef.current.style.display = "none";
+          }
+          const pageData = await getPageData({}, null, document, window);
+          // console.log("!!!!!!!publish!", { pageData });
+          const encoder = new TextEncoder();
+          const dataBuff = encoder.encode(pageData.content);
           const { arTxId, koiiTxId } = await uploadToKoii(
             walletAddress,
             dataBuff
@@ -258,6 +263,7 @@ export default function TranslateOverlay() {
           alert("Upload failed");
         } finally {
           setLoading(false);
+          if (toolbarRef.current) toolbarRef.current.style.display = "block";
         }
       }
     } else {
@@ -271,6 +277,7 @@ export default function TranslateOverlay() {
         height: "100%",
         background: translationOn ? "rgba(100, 200, 100, 0.1)" : "transparent",
       }}
+      ref={toolbarRef}
     >
       <div
         style={{
